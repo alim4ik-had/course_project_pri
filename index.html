@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог курсов</title>
+    <!--Стили иконок-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Каталог курсов</span>
+            </div>
+            <button class="btn btn-primary" id="addCourseBtn">
+                <i class="fas fa-plus"></i> Добавить курс
+            </button>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="main-content">
+        <aside class="sidebar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Поиск курсов...">
+            </div>
+
+            <div class="filter-section">
+                <h3 class="filter-title">
+                    <i class="fas fa-filter"></i> Статус
+                </h3>
+                <div class="filter-options">
+                    <div class="filter-option">
+                        <input type="checkbox" id="status-all" checked>
+                        <label for="status-all">Все курсы</label>
+                    </div>
+                    <div class="filter-option">
+                        <input type="checkbox" id="status-in-progress">
+                        <label for="status-in-progress">В процессе</label>
+                    </div>
+                    <div class="filter-option">
+                        <input type="checkbox" id="status-completed">
+                        <label for="status-completed">Завершённые</label>
+                    </div>
+                    <div class="filter-option">
+                        <input type="checkbox" id="status-not-started">
+                        <label for="status-not-started">Не начатые</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3 class="filter-title">
+                    <i class="fas fa-star"></i> Избранное
+                </h3>
+                <div class="filter-options">
+                    <div class="filter-option">
+                        <input type="checkbox" id="favorite-only">
+                        <label for="favorite-only">Только избранные</label>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="courses-section">
+            <div class="courses-grid" id="coursesContainer">
+                <!--Примеры курсов-->
+                <div class="course-card">
+                    <div class="course-header">
+                        <h3 class="course-title">Веб-разработка для начинающих</h3>
+                        <p class="course-description">Изучите основы HTML, CSS и JavaScript для создания современных веб-сайтов.</p>
+                        <button class="favorite-btn active" data-id="1">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                    <div class="course-body">
+                        <div class="progress-section">
+                            <div class="progress-info">
+                                <span>Прогресс:</span>
+                                <span>50%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div class="course-stats">
+                            <span>2/4 задач</span>
+                            <span>В процессе</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-header">
+                        <h3 class="course-title">Python для анализа данных</h3>
+                        <p class="course-description">Научитесь использовать Python для обработки и анализа данных.</p>
+                        <button class="favorite-btn " data-id="2">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                    <div class="course-body">
+                        <div class="progress-section">
+                            <div class="progress-info">
+                                <span>Прогресс:</span>
+                                <span>25%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 25%"></div>
+                            </div>
+                        </div>
+                        <div class="course-stats">
+                            <span>1/4 задач</span>
+                            <span>В процессе</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-header">
+                        <h3 class="course-title">Дизайн интерфейсов (UI/UX)</h3>
+                        <p class="course-description">Освойте принципы создания удобных и красивых интерфейсов.</p>
+                        <button class="favorite-btn active" data-id="3">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                    <div class="course-body">
+                        <div class="progress-section">
+                            <div class="progress-info">
+                                <span>Прогресс:</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="course-stats">
+                            <span>3/4 задач</span>
+                            <span>В процессе</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Модальное окно добавления курса -->
+<div class="modal-overlay" id="addCourseModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Добавить новый курс</h2>
+            <button class="close-btn" id="closeAddModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="addCourseForm">
+                <div class="form-group">
+                    <label for="courseTitle" class="form-label">Название курса</label>
+                    <input type="text" id="courseTitle" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseDescription" class="form-label">Описание курса</label>
+                    <textarea id="courseDescription" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Задачи курса</label>
+                    <div class="tasks-list" id="tasksList">
+                        <!-- Пример элемента отображения задачи курса -->
+                        <div class="task-item">
+                            <input type="text" class="form-control task-input" placeholder="Введите задачу">
+                            <div class="task-actions">
+                                <button type="button" class="remove-task-btn" data-task-id="1761399598657">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline" id="addTaskBtn">
+                        <i class="fas fa-plus"></i> Добавить задачу
+                    </button>
+                </div>
+                <div class="form-group" style="text-align: right; margin-top: 30px;">
+                    <button type="button" class="btn btn-outline" id="cancelAddCourse">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить курс</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно просмотра курса (заполнен данными одного из курсов для наглядности) -->
+<div class="modal-overlay" id="viewCourseModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title" id="viewCourseTitle">Веб-разработка для начинающих</h2>
+            <button class="close-btn" id="closeViewModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p id="viewCourseDescription">Изучите основы HTML, CSS и JavaScript для создания современных веб-сайтов.</p>
+
+            <div class="progress-section" style="margin: 20px 0;">
+                <div class="progress-info">
+                    <span>Прогресс:</span>
+                    <span id="viewCourseProgress">50%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="viewCourseProgressBar" style="width: 50%;"></div>
+                </div>
+            </div>
+
+            <h3 style="margin: 25px 0 15px;">Задачи курса</h3>
+            <div class="tasks-list" id="viewTasksList"><div class="task-item">
+                <input type="checkbox" class="task-checkbox" checked="" data-task-id="1" data-course-id="1">
+                <span class="task-text">Изучить основы HTML</span>
+            </div><div class="task-item">
+                <input type="checkbox" class="task-checkbox" checked="" data-task-id="2" data-course-id="1">
+                <span class="task-text">Освоить CSS и Flexbox</span>
+            </div><div class="task-item">
+                <input type="checkbox" class="task-checkbox" data-task-id="3" data-course-id="1">
+                <span class="task-text">Познакомиться с JavaScript</span>
+            </div><div class="task-item">
+                <input type="checkbox" class="task-checkbox" data-task-id="4" data-course-id="1">
+                <span class="task-text">Создать первый проект</span>
+            </div></div>
+            <div class="modal-actions" style="margin-top: 30px; text-align: right;">
+                <button class="btn btn-danger" id="deleteCourseBtn">
+                    <i class="fas fa-trash"></i> Удалить курс
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
