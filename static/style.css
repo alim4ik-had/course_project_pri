@@ -437,16 +437,90 @@ input[type="checkbox"]:checked {
     color: var(--dark);
 }
 
-.empty-state {
+.empty-courses-state {
+    grid-column: 1 / -1;
     text-align: center;
-    padding: 40px 20px;
-    color: var(--gray);
+    padding: 60px 40px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: var(--border-radius);
+    border: 2px dashed var(--gray-light);
+    opacity: 0.8;
+    transition: var(--transition);
 }
 
-.empty-state i {
-    font-size: 3rem;
+.empty-courses-state:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.empty-courses-icon {
+    font-size: 4rem;
+    color: var(--primary-light);
+    margin-bottom: 20px;
+    opacity: 0.6;
+}
+
+.empty-courses-state h3 {
+    font-size: 1.5rem;
     margin-bottom: 15px;
-    opacity: 0.5;
+    color: var(--dark);
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+.empty-courses-state p {
+    font-size: 1rem;
+    color: var(--gray);
+    margin-bottom: 25px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+    opacity: 0.7;
+}
+
+#emptyStateAddBtn {
+    padding: 12px 30px;
+    font-size: 1rem;
+}
+.validation-error {
+    background: linear-gradient(135deg, #fee 0%, #ffe6e6 100%);
+    border: 1px solid #f5c6cb;
+    border-left: 4px solid #dc3545;
+    border-radius: 4px;
+    margin: 0 20px 20px 20px;
+    padding: 12px 15px;
+    animation: slideDown 0.3s ease-out;
+}
+
+.validation-error .error-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.validation-error .fas.fa-exclamation-circle {
+    color: #dc3545;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.validation-error .error-message {
+    color: #721c24;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 768px) {
@@ -464,5 +538,20 @@ input[type="checkbox"]:checked {
 
     .courses-grid {
         grid-template-columns: 1fr;
+    }
+    .empty-courses-state {
+        padding: 40px 20px;
+    }
+
+    .empty-courses-icon {
+        font-size: 3rem;
+    }
+
+    .empty-courses-state h3 {
+        font-size: 1.3rem;
+    }
+
+    .empty-courses-state p {
+        font-size: 0.9rem;
     }
 }
