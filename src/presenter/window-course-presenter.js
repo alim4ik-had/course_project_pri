@@ -8,11 +8,9 @@ export default class WindowCoursePresenter{
     #windowView = null;
     #windowContainer = null;
     #courseModel = null;
-    #sidebar = null;
-    constructor(container, courseModel, sidebar) {
+    constructor(container, courseModel) {
         this.#windowContainer = container;
         this.#courseModel = courseModel;
-        this.#sidebar = sidebar;
     }
 
     initWindow(course){
@@ -45,14 +43,12 @@ export default class WindowCoursePresenter{
 
     }
 
-    #changeTaskStatus(taskId){
-        this.#courseModel.updateTaskStatus(this.#course, taskId);
-        this.#sidebar.reloadAfterChangeCourse();
+    async #changeTaskStatus(taskId){
+        await this.#courseModel.updateTaskStatus(this.#course, taskId);
         this.#windowView.changeCourseProgress(this.#courseModel.getCourseProgress(this.#course));
     }
-    #deleteCourse(){
-        this.#courseModel.deleteCourse(this.#course.id);
-        this.#sidebar.reloadAfterChangeCourse();
+    async #deleteCourse(){
+        await this.#courseModel.deleteCourses(this.#course.id);
         this.#closeWindow();
     }
 }

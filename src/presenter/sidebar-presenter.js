@@ -2,6 +2,8 @@ import SearchCourseView from "../view/sidebar/search-course-view.js";
 import FilterSectionContainerView from "../view/sidebar/filter-section-container-view.js";
 import {render, RenderPosition} from "../framework/render.js";
 import FilterOptionView from "../view/sidebar/filter-option-view.js";
+import LoadingFilterView from "../view/sidebar/loading-filter-view.js";
+import {UpdateType, UserActions} from "../const.js";
 
 export default class SidebarPresenter{
 
@@ -10,12 +12,15 @@ export default class SidebarPresenter{
     #filterSection = null;
     #statusModel = null;
     #courseModel = null;
+    #loadingView = null;
 
     constructor(sidebarContainer, statusModel, courseModel) {
         this.#sidebarContainer = sidebarContainer;
         this.#searchInput = new SearchCourseView(this.#searchFilter.bind(this));
         this.#statusModel = statusModel;
         this.#courseModel = courseModel;
+        this.#loadingView = new LoadingFilterView();
+        this.#courseModel.addObserver(this.#reloadAfterChangeCourse.bind(this));
     }
 
     get statusList(){
@@ -28,10 +33,22 @@ export default class SidebarPresenter{
         return this.#statusModel.favoriteStatus;
     }
 
-    initSidebar(){
+    async initSidebar(){
+        await this.#statusInit();
         this.#renderSearchInput();
         this.#renderStatusFilter()
         this.#renderFavoriteFilter()
+    }
+    async #statusInit(){
+        this.#renderLoading();
+        await this.#statusModel.init();
+        this.#removeLoading();
+    }
+    #renderLoading(){
+        render(this.#loadingView, this.#sidebarContainer, RenderPosition.BEFOREEND);
+    }
+    #removeLoading(){
+        this.#loadingView.removeElement();
     }
 
     #renderSearchInput(){
@@ -65,15 +82,21 @@ export default class SidebarPresenter{
             const status = this.statusList.find(status => status.slug === slug);
             status.isChecked = !status.isChecked;
         }
-        this.#courseModel.filterCourses(this.favoriteStatus.isChecked, this.checkedStatusList);
+        this.#courseModel.updateFilterParams(this.favoriteStatus.isChecked, this.checkedStatusList);
     }
 
     #searchFilter(text) {
         this.#courseModel.searchCourse(text);
-        this.#filterCourse();
     }
 
-    reloadAfterChangeCourse(){
-        this.#filterCourse();
+    #reloadAfterChangeCourse(event, payload){
+        switch (event){
+            case UserActions.UPDATE_COURSE:
+            case UserActions.ADD_COURSE:
+            case UserActions.DELETE_COURSE:
+            case UpdateType.MINOR:
+                this.#courseModel.filterCourses();
+                break;
+        }
     }
 }

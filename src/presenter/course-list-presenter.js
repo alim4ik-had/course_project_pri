@@ -2,21 +2,25 @@ import {render, RenderPosition} from "../framework/render.js";
 import CourseCardView from "../view/main-content/course-card-view.js";
 import NoCourseView from "../view/main-content/no-course-view.js";
 import {openAddModalWindow} from "../main.js";
+import LoadingView from "../view/main-content/loading-view.js";
+import {UpdateType, UserActions} from "../const.js";
 
 export default class CourseListPresenter{
 
     #courseGrid = null;
     #courseModel = null;
     #statusModel = null;
-    #sidebar = null;
     #courseWindowPresenter = null;
+    #loadingView = null;
+    #sidebar = null;
 
-    constructor(courseGrid, courseModel, statusModel, sidebar, courseWindowPresenter) {
+    constructor(courseGrid, courseModel, statusModel, courseWindowPresenter, sidebar) {
         this.#courseGrid = courseGrid;
         this.#courseModel = courseModel;
         this.#statusModel = statusModel;
-        this.#sidebar = sidebar;
         this.#courseWindowPresenter = courseWindowPresenter;
+        this.#loadingView = new LoadingView();
+        this.#sidebar = sidebar;
         this.#courseModel.addObserver(this.#handleModelChange.bind(this));
     }
 
@@ -27,8 +31,22 @@ export default class CourseListPresenter{
         return this.#statusModel.statusList;
     }
 
-    initCourseGrid(){
-        this.#renderCourseList()
+    async initCourseGrid(){
+        await this.#initData();
+        this.#renderCourseList();
+    }
+
+    async #initData(){
+        this.#renderLoading();
+        await this.#sidebar.initSidebar();
+        await this.#courseModel.init();
+        this.#removeLoading();
+    }
+    #renderLoading(){
+        render(this.#loadingView, this.#courseGrid, RenderPosition.BEFOREEND);
+    }
+    #removeLoading(){
+        this.#loadingView.removeElement();
     }
 
     #renderCourseList(){
@@ -49,14 +67,20 @@ export default class CourseListPresenter{
         }
     }
 
-    #changeFavorite(idCourse){
-        this.#courseModel.changeFavorite(idCourse);
-        this.#sidebar.reloadAfterChangeCourse();
+    async #changeFavorite(idCourse){
+        await this.#courseModel.changeFavorite(idCourse);
     }
 
-    #handleModelChange(){
-        this.#clearCourseGrid();
-        this.#renderCourseList();
+    #handleModelChange(event, payload){
+        switch (event){
+            case UserActions.ADD_COURSE:
+            case UserActions.DELETE_COURSE:
+            case UserActions.UPDATE_COURSE:
+            case UpdateType.MINOR:
+                this.#clearCourseGrid();
+                this.#renderCourseList();
+                break;
+        }
     }
     #clearCourseGrid(){
         this.#courseGrid.innerHTML = '';

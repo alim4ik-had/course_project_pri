@@ -3,7 +3,7 @@ import AddFormView from "../view/modal-window-course-create/add-form-view.js";
 import {render, RenderPosition} from "../framework/render.js";
 import AddTaskItemView from "../view/modal-window-course-create/add-task-item-view.js";
 import ValidationErrorView from "../view/modal-window-course-create/validation-error-view.js";
-import {ErrorMessage} from "../utils.js";
+import {ErrorMessage} from "../const.js";
 
 export default class AddWindowPresenter{
 
@@ -14,12 +14,10 @@ export default class AddWindowPresenter{
     #formAdd = null;
     #taskElementList = null;
     #courseModel = null;
-    #sidebar = null;
 
-    constructor(container, courseModel, sidebar) {
+    constructor(container, courseModel) {
         this.#windowContainer = container;
         this.#courseModel = courseModel;
-        this.#sidebar = sidebar;
     }
 
     initWindow(){
@@ -47,7 +45,7 @@ export default class AddWindowPresenter{
         this.#taskElementList = this.#taskElementList.filter(task => !task.isRemoved());
     }
 
-    #saveCourse(){
+    async #saveCourse(){
         const title = this.#formAdd.title;
         const description = this.#formAdd.description;
         const tasks = new Set();
@@ -62,9 +60,8 @@ export default class AddWindowPresenter{
         if(this.#isErrorValid(title, tasks))
             return;
 
-        this.#courseModel.createCourse(title, description, tasks);
+        await this.#courseModel.createCourse(title, description, tasks);
         this.#closeWindow();
-        this.#sidebar.reloadAfterChangeCourse();
 
     }
 

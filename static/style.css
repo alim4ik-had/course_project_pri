@@ -522,6 +522,72 @@ input[type="checkbox"]:checked {
         transform: translateY(0);
     }
 }
+.loading-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 40px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.loading-spinner {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner-circle {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.spinner-circle:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.spinner-circle:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+.loading-text {
+    color: var(--dark);
+    font-size: 1.1rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 @media (max-width: 768px) {
     .main-content {
@@ -553,5 +619,17 @@ input[type="checkbox"]:checked {
 
     .empty-courses-state p {
         font-size: 0.9rem;
+    }
+    .loading-state {
+        padding: 40px 20px;
+    }
+
+    .spinner-circle {
+        width: 16px;
+        height: 16px;
+    }
+
+    .loading-text {
+        font-size: 1rem;
     }
 }
