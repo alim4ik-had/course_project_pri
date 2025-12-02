@@ -1,10 +1,12 @@
-import {status} from "../mock/status.js";
-
 
 export default class StatusModel{
 
-    #statusList = status.filter(status => status.slug !== "favorite");
-    #favoriteStatus = status.find(status => status.slug === "favorite");
+    #statusList = [];
+    #favoriteStatus = []
+    #statusApiService = null;
+    constructor(apiService) {
+        this.#statusApiService = apiService;
+    }
 
     get statusList(){
         return this.#statusList;
@@ -14,5 +16,16 @@ export default class StatusModel{
     }
     set statusList(statusList){
         this.#statusList = statusList;
+    }
+    async init(){
+        try {
+            const statuses = await this.#statusApiService.courses;
+            this.#statusList = statuses.filter(status => status.slug !== "favorite");
+            this.#favoriteStatus = statuses.find(status => status.slug === "favorite");
+        }catch (e) {
+            this.#statusList = [];
+            this.#favoriteStatus = [];
+            console.error('Ошибка при получении статусов из сервера: ', e);
+        }
     }
 }

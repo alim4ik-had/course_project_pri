@@ -1,12 +1,19 @@
 import Observable from "../framework/observable.js";
-import {courses} from "../mock/courses.js";
-import {generateID} from "../utils.js";
+import {UpdateType, UserActions} from "../const.js";
 
 export default class CourseModel extends Observable{
 
-    #finalCourseList = courses;
-    #courseList = courses;
+    #courseApiService = null;
+    #finalCourseList = [];
+    #courseList = [];
     #foundCourseList = null
+    #isFavoriteChecked = false;
+    #checkedStatuses = [];
+
+    constructor(apiService) {
+        super();
+        this.#courseApiService = apiService;
+    }
 
     get courseList(){
         return this.#courseList;
@@ -15,10 +22,25 @@ export default class CourseModel extends Observable{
         this.#courseList = courseList;
     }
 
-    filterCourses(isFavoriteChecked, checkedStatuses){
-        let favoriteList = this.#filterByFavorite(isFavoriteChecked);
-        if(checkedStatuses.length > 0)
-            this.courseList = favoriteList.filter(course => checkedStatuses.some(status => course.status === status.slug));
+    async init(){
+        try {
+            this.#finalCourseList = await this.#courseApiService.courses;
+        }catch (e) {
+            this.#finalCourseList = [];
+        }
+        this.#courseList = this.#finalCourseList;
+        this._notify(UpdateType.INIT)
+    }
+
+    updateFilterParams(isFavoriteChecked, checkedStatuses){
+        this.#isFavoriteChecked = isFavoriteChecked;
+        this.#checkedStatuses = checkedStatuses;
+        this._notify(UpdateType.MINOR);
+    }
+    filterCourses(){
+        let favoriteList = this.#filterByFavorite(this.#isFavoriteChecked);
+        if(this.#checkedStatuses.length > 0)
+            this.courseList = favoriteList.filter(course => this.#checkedStatuses.some(status => course.status === status.slug));
         else
             this.courseList = favoriteList;
 
@@ -30,7 +52,6 @@ export default class CourseModel extends Observable{
         else if(this.#foundCourseList?.length === 0){
             this.courseList = this.#foundCourseList;
         }
-        this._notify()
     }
 
     searchCourse(text){
@@ -40,43 +61,67 @@ export default class CourseModel extends Observable{
             this.#foundCourseList = this.#finalCourseList.filter(course =>
                 course.title.toLowerCase().includes(text) || course.description.toLowerCase().includes(text));
         }
+        this._notify(UpdateType.MINOR);
     }
 
-    createCourse(title, description, tasksTitle){
+    async createCourse(title, description, tasksTitle){
         if(!description)
             description = 'Описание отсутствует';
         const tasks = []
         let taskId = 1;
         for(let task of tasksTitle){
             tasks.push({
-                id: taskId,
+                id: taskId.toString(),
                 title: task,
                 isComplete: false
             });
             taskId++;
         }
+        // id для course будет присваиваться на стороне сервера
         const course = {
-            id: generateID(),
             title: title,
             description: description,
             tasks: tasks,
             isFavorite: false,
-            status: "no-started"
+            status: "no-started",
+        }
+        try{
+            const createdCourse = await this.#courseApiService.addCourse(course);
+            this.#finalCourseList.push(createdCourse);
+            this._notify(UserActions.ADD_COURSE, createdCourse);
+        }catch (e){
+            console.error('Ошибка при добавлении курса на сервер: ', e);
         }
 
-        this.#finalCourseList.push(course);
 
     }
 
-    changeFavorite(idCourse){
-        const course = this.courseList.find(course => course.id === parseInt(idCourse));
-        course.isFavorite = !course.isFavorite;
+    async changeFavorite(idCourse){
+        const course = this.courseList.find(course => course.id === idCourse);
+        try{
+            course.isFavorite = !course.isFavorite;
+            const updatedCourse = await this.#courseApiService.updateCourse(course);
+            this._notify(UserActions.UPDATE_COURSE, updatedCourse);
+        }catch (e){
+            course.isFavorite = !course.isFavorite;
+            console.error('Ошибка при добавлении курса в избранное: ', e);
+        }
+
     }
 
-    updateTaskStatus(course, taskId){
-        const task = course.tasks.find(task => task.id === parseInt(taskId));
-        task.isComplete = !task.isComplete;
-        this.#updateCourseStatus(course);
+    async updateTaskStatus(course, taskId){
+        const task = course.tasks.find(task => task.id === taskId);
+        const oldStatus = course.status;
+        try{
+            task.isComplete = !task.isComplete;
+            this.#updateCourseStatus(course);
+            const updatedCourse = await this.#courseApiService.updateCourse(course);
+            this._notify(UserActions.UPDATE_COURSE, updatedCourse);
+        }catch (e){
+            task.isComplete = !task.isComplete;
+            course.status = oldStatus;
+            console.error(`Ошибка при изменении статуса задачи ${task.id}: `, e);
+        }
     }
 
     getCourseProgress(course){
@@ -85,8 +130,14 @@ export default class CourseModel extends Observable{
         return Math.round((completedTaskCount/taskCount)*100);
     }
 
-    deleteCourse(courseId){
-        this.#finalCourseList = this.#finalCourseList.filter(course => course.id !== parseInt(courseId));
+    async deleteCourses(courseId){
+        try{
+            await this.#courseApiService.deleteCourse(courseId);
+            this.#finalCourseList = this.#finalCourseList.filter(course => course.id !== courseId);
+            this._notify(UserActions.DELETE_COURSE, {courseId: courseId});
+        }catch (e){
+            console.error(`Ошибка при удалении курса : `, e);
+        }
     }
 
     #filterByFavorite(isChecked){
@@ -99,7 +150,7 @@ export default class CourseModel extends Observable{
     }
 
     findById(id){
-        return this.#finalCourseList.find(course => course.id === parseInt(id));
+        return this.#finalCourseList.find(course => course.id === id);
     }
 
     #updateCourseStatus(course){
