@@ -66,7 +66,7 @@ export default class CourseModel extends Observable{
 
     async createCourse(title, description, tasksTitle){
         if(!description)
-            description = 'Описание отсутствует';
+            description = '';
         const tasks = []
         let taskId = 1;
         for(let task of tasksTitle){
