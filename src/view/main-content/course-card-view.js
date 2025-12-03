@@ -7,7 +7,7 @@ function createCourseCardView(cardInfo){
     return `<div class="course-card" data-id="${cardInfo.course.id}">
                 <div class="course-header">
                     <h3 class="course-title">${cardInfo.course.title}</h3>
-                    <p class="course-description">${cardInfo.course.description}</p>
+                    <p class="course-description">${cardInfo.course.description? cardInfo.course.description : "Нет описания"}</p>
                     <button id="favoriteBtn" class="favorite-btn ${cardInfo.course.isFavorite ? "active" : ''}" data-id="${cardInfo.course.id}">
                         <i class="fas fa-star"></i>
                     </button>

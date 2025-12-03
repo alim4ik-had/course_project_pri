@@ -10,7 +10,7 @@ function createModalWindowCourseView(courseInfo){
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p id="viewCourseDescription">${courseInfo.description}</p>
+                        <p id="viewCourseDescription">${courseInfo.description? courseInfo.description : "У данного курса отсутствует описание"}</p>
             
                         <div class="progress-section" style="margin: 20px 0;">
                             <div class="progress-info">
