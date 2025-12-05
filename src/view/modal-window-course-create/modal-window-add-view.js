@@ -23,14 +23,17 @@ export default class ModalWindowAddView extends AbstractView{
 
     #isActive = false;
     #keyDown = null;
-    #boundFunc = null;
+    #boundFuncKey = null;
+    #boundFuncClick = null;
 
     constructor(isActive, keyDown) {
         super();
         this.#isActive = isActive;
         this.#keyDown = keyDown;
-        this.#boundFunc =  this.#handleKeyDown.bind(this);
-        document.addEventListener('keydown', this.#boundFunc);
+        this.#boundFuncKey =  this.#handleKeyDown.bind(this);
+        this.#boundFuncClick =  this.#handleCloseClick.bind(this);
+        document.addEventListener('keydown', this.#boundFuncKey);
+        document.addEventListener('click', this.#boundFuncClick);
         this.element.querySelector("#closeAddModal").addEventListener("click", this.#handleCloseWindow.bind(this));
     }
     get template(){
@@ -47,11 +50,24 @@ export default class ModalWindowAddView extends AbstractView{
     #handleCloseWindow = (e) => {
         e.preventDefault();
         this.removeElement();
+        document.removeEventListener('keydown', this.#boundFuncKey);
+        document.removeEventListener('click', this.#boundFuncClick);
     }
     #handleKeyDown = (e) => {
         e.preventDefault();
-        document.removeEventListener('keydown', this.#boundFunc);
-        if(e.key === 'Escape' && !this.isRemoved())
+        if(e.key === 'Escape' && !this.isRemoved()){
+            document.removeEventListener('keydown', this.#boundFuncKey);
+            document.removeEventListener('click', this.#boundFuncClick);
             this.#keyDown();
+        }
+    }
+    #handleCloseClick = (e) => {
+        e.preventDefault();
+        if(e.target === this.element){
+            console.log("fff")
+            document.removeEventListener('click', this.#boundFuncClick);
+            document.removeEventListener('keydown', this.#boundFuncKey);
+            this.#keyDown();
+        }
     }
 }

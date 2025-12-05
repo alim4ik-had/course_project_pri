@@ -41,17 +41,20 @@ export default class ModalWindowCourseView extends AbstractView{
     #onClickClose = null;
     #deleteCourse = null;
     #keyDown = null;
-    #boundFunc = null;
+    #boundFuncKey = null;
+    #boundFuncClick = null;
     constructor(courseInfo, onClickClose, deleteCourse, keyDown) {
         super();
         this.#courseInfo = courseInfo;
         this.#onClickClose = onClickClose;
         this.#deleteCourse = deleteCourse;
         this.#keyDown = keyDown;
-        this.#boundFunc = this.#handleKeyDown.bind(this);
+        this.#boundFuncKey =  this.#handleKeyDown.bind(this);
+        this.#boundFuncClick =  this.#handleCloseClick.bind(this);
+        document.addEventListener('click', this.#boundFuncClick);
         this.element.querySelector(".close-btn").addEventListener("click", this.#handleCloseWindow.bind(this));
         this.element.querySelector("#deleteCourseBtn").addEventListener('click', this.#handleDeleteCourse.bind(this));
-        document.addEventListener('keydown', this.#boundFunc);
+        document.addEventListener('keydown', this.#boundFuncKey);
     }
     get template(){
         return createModalWindowCourseView(this.#courseInfo);
@@ -68,6 +71,8 @@ export default class ModalWindowCourseView extends AbstractView{
     #handleCloseWindow = (e) => {
         e.preventDefault();
         this.#onClickClose();
+        document.removeEventListener('keydown', this.#boundFuncKey);
+        document.removeEventListener('click', this.#boundFuncClick);
     }
     #handleDeleteCourse = (e) => {
         e.preventDefault();
@@ -75,9 +80,18 @@ export default class ModalWindowCourseView extends AbstractView{
     }
     #handleKeyDown = (e) => {
         e.preventDefault();
-        document.removeEventListener('keydown', this.#boundFunc);
-        console.log("ff")
-        if(e.key === 'Escape' && !this.isRemoved())
+        if(e.key === 'Escape' && !this.isRemoved()){
+            document.removeEventListener('keydown', this.#boundFuncKey);
+            document.removeEventListener('click', this.#boundFuncClick);
             this.#keyDown();
+        }
+    }
+    #handleCloseClick = (e) => {
+        e.preventDefault();
+        if(e.target === this.element){
+            document.removeEventListener('click', this.#boundFuncClick);
+            document.removeEventListener('keydown', this.#boundFuncKey);
+            this.#keyDown();
+        }
     }
 }
