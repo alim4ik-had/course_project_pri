@@ -22,7 +22,7 @@ export default class AddWindowPresenter{
 
     initWindow(){
         this.#taskElementList = []
-        this.#windowView = new ModalWindowAddView(true);
+        this.#windowView = new ModalWindowAddView(true, this.#closeWindow.bind(this));
         this.#windowBody = this.#windowView.modalBody;
         this.#validErrorContainer = this.#windowView.validErrorContainer;
         this.#formAdd = new AddFormView(this.#closeWindow.bind(this), this.#addTaskElement.bind(this), this.#saveCourse.bind(this));

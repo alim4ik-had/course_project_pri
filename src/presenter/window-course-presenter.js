@@ -15,9 +15,9 @@ export default class WindowCoursePresenter{
 
     initWindow(course){
         this.#course = course;
-        this.#windowView = new ModalWindowCourseView(this.#prepareData(course), this.#closeWindow.bind(this), this.#deleteCourse.bind(this));
+        this.#windowView = new ModalWindowCourseView(this.#prepareData(course), this.#closeWindow.bind(this), this.#deleteCourse.bind(this), this.#closeWindow.bind(this));
         render(this.#windowView, this.#windowContainer, RenderPosition.BEFOREEND);
-        this.#renderTasks(course, this.#windowView.taskListContainer)
+        this.#renderTasks(course, this.#windowView.taskListContainer);
     }
 
     #prepareData(course){

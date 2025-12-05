@@ -22,10 +22,13 @@ function createModalWindowAddView(isActive){
 export default class ModalWindowAddView extends AbstractView{
 
     #isActive = false;
+    #keyDown = null;
 
-    constructor(isActive) {
+    constructor(isActive, keyDown) {
         super();
         this.#isActive = isActive;
+        this.#keyDown = keyDown;
+        document.addEventListener('keydown', this.#handleKeyDown.bind(this));
         this.element.querySelector("#closeAddModal").addEventListener("click", this.#handleCloseWindow.bind(this));
     }
     get template(){
@@ -42,5 +45,10 @@ export default class ModalWindowAddView extends AbstractView{
     #handleCloseWindow = (e) => {
         e.preventDefault();
         this.removeElement();
+    }
+    #handleKeyDown = (e) => {
+        e.preventDefault();
+        if(e.key === 'Escape' && !this.isRemoved())
+            this.#keyDown();
     }
 }
