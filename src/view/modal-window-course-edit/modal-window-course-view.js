@@ -41,15 +41,17 @@ export default class ModalWindowCourseView extends AbstractView{
     #onClickClose = null;
     #deleteCourse = null;
     #keyDown = null;
+    #boundFunc = null;
     constructor(courseInfo, onClickClose, deleteCourse, keyDown) {
         super();
         this.#courseInfo = courseInfo;
         this.#onClickClose = onClickClose;
         this.#deleteCourse = deleteCourse;
         this.#keyDown = keyDown;
+        this.#boundFunc = this.#handleKeyDown.bind(this);
         this.element.querySelector(".close-btn").addEventListener("click", this.#handleCloseWindow.bind(this));
         this.element.querySelector("#deleteCourseBtn").addEventListener('click', this.#handleDeleteCourse.bind(this));
-        document.addEventListener('keydown', this.#handleKeyDown.bind(this));
+        document.addEventListener('keydown', this.#boundFunc);
     }
     get template(){
         return createModalWindowCourseView(this.#courseInfo);
@@ -73,6 +75,8 @@ export default class ModalWindowCourseView extends AbstractView{
     }
     #handleKeyDown = (e) => {
         e.preventDefault();
+        document.removeEventListener('keydown', this.#boundFunc);
+        console.log("ff")
         if(e.key === 'Escape' && !this.isRemoved())
             this.#keyDown();
     }
